@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import HeaderRoomChat from "../component/HeaderRoomChat";
+import HeaderRoomChat from "../../component/HeaderRoomChat";
 
 export default function ChatRoom({navigation}) {
   return (
