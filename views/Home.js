@@ -133,7 +133,6 @@ export default function Home({ navigation }) {
       page: 'ChatRoom',
       timelastmessage: "20/04",
       typemessage: typemessages[11],
-      icon:'',
       statusseen: false,
       navigation: navigation,
     },
