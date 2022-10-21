@@ -15,15 +15,15 @@ export default class Search extends Component {
         style={styles.gradient}
       >
 
-        <TouchableOpacity style={{paddingLeft:10, paddingRight:10, borderRadius:50}}><Ionicons name="search-outline" size={32} color="#fff" />
+        <TouchableOpacity style={{paddingLeft:10, paddingRight:10, borderRadius:50}}><Ionicons name="search-outline" size={28} color="#fff" />
         </TouchableOpacity>
         <TextInput placeholderTextColor='#fff' placeholder='Tìm kiếm' style={{opacity:0.5, color:'#fff', fontSize:20,width:'60%'}}></TextInput>
         <TouchableOpacity style={{paddingLeft:10, paddingRight:10}}>
-        <MaterialIcons name="qr-code-scanner" size={32} color="#fff" />
+        <MaterialIcons name="qr-code-scanner" size={25} color="#fff" style={{opacity:0.8}}/>
         </TouchableOpacity>
         
         <TouchableOpacity style={{paddingLeft:10, paddingRight:10}}>
-        <Feather name="plus" size={38} color="#fff" />
+        <Feather name="plus" size={30} color="#fff" style={{opacity:0.8}}/>
         </TouchableOpacity>
         </LinearGradient>
     )
@@ -32,6 +32,6 @@ export default class Search extends Component {
 
 const styles = StyleSheet.create({
     gradient:{
-        height:60,width:'100%', flexDirection:'row', alignItems:'center'
+        height:50,width:'100%', flexDirection:'row', alignItems:'center'
     }
 })
