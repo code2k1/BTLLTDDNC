@@ -6,10 +6,32 @@ import {
   TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import{initializeAuth,signInWithEmailAndPassword,} from 'firebase/auth';
+import {initializeApp} from 'firebase/app';
+import { firebaseConfig } from "../firebase";
+import { useNavigation } from "@react-navigation/native";
 
 const DangNhap = (props) => {
+  const navigation = useNavigation();
+  const [email,setEmail] = useState("");
+  const [passWord,setPassWord] = useState("");
+  //Firebase 
+  const app = initializeApp(firebaseConfig);
+  const auth = initializeAuth(app,{});
+  const hanldPressLogin = ()=>{
+    signInWithEmailAndPassword(auth,email,passWord)
+    .then(()=>{
+        const accessToken =`Bearer ${auth.currentUser.stsTokenManager.accessToken}`;
+        console.log(accessToken);
+        navigation.navigate("HomeListFriend");
+    })
+    .catch(error =>{
+        Alert.alert("Thông báo","Xảy ra lỗi! \n Mời bạn nhập lại tài khoản và mật khẩu")
+    })
+}
   return (
     <View style={{ backgroundColor: "#fff", flex: 1 }}>
       <View style={{ marginTop: 40 }}>
@@ -38,8 +60,7 @@ const DangNhap = (props) => {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Số điện thoại"
-                  // value={email}
-                  //onChangeText={text => setEmail(text)}
+                  onChangeText={x=>setEmail(x)} value={email}
                   style={styles.input}
                 />
               </View>
@@ -52,8 +73,7 @@ const DangNhap = (props) => {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Mật khẩu"
-                  // value={passWord}
-                  //onChangeText={text => setPassWord(text)}
+                  onChangeText={x=>setPassWord(x)} value={passWord}
                   style={styles.input}
                   secureTextEntry
                 />
@@ -75,12 +95,12 @@ const DangNhap = (props) => {
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                onPress={() =>
-                  props.navigation.navigate("HomeListFriend", {
-                    name: "HomeListFriend",
-                  })
-                }
-                //onPress={moveScreen1}
+                // onPress={() =>
+                //   props.navigation.navigate("HomeListFriend", {
+                //     name: "HomeListFriend",
+                //   })
+                // }
+                onPress={hanldPressLogin}
                 style={styles.button}
               >
                 <Text style={styles.buttonText}>Đăng nhập</Text>

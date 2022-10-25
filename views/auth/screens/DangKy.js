@@ -7,10 +7,54 @@ import {
   TextInput,
   KeyboardAvoidingView,
   ScrollView,
+  Alert,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import{initializeAuth,createUserWithEmailAndPassword, sendEmailVerification} from 'firebase/auth';
+import {initializeApp} from 'firebase/app';
+import { firebaseConfig } from "../firebase";
+import { useNavigation } from "@react-navigation/native";
 
 const DangKy = (props) => {
+  const navigation = useNavigation();
+  const [isPassword,setIsPassword] = useState(true);
+  const [isPasswordAgain,setIsPasswordAgain] = useState(true);
+  const [email,setEmail] = useState("");
+  const [userName,setuserName] = useState("");
+  const [passWord,setPassWord] = useState("");
+  const [passWordAgain,setPassWordAgain] = useState("");
+  const app = initializeApp(firebaseConfig);
+  const auth = initializeAuth(app,{});
+  const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  const hanldPressRegister = ()=>{
+    if(email == ""){
+        Alert.alert("Thông báo","Email không được rỗng")
+    }
+    else {
+        if(!regexEmail.test(email)&& passWord == passWordAgain || !regexEmail.test(email)&& passWord != passWordAgain){
+            Alert.alert("Thông báo","Email không hợp lệ")
+        }
+        else if(regexEmail.test(email) && passWord != passWordAgain) {
+            Alert.alert("Thông báo","Mật khẩu xác nhận không giống với mật khẩu trên")
+        }
+        else if(regexEmail.test(email) && passWord == "") {
+            Alert.alert("Thông báo","Mời bạn nhập mật khẩu")
+        }
+        else 
+        {
+            createUserWithEmailAndPassword(auth,email,passWord)
+            .then(()=>{
+                Alert.alert("Thông báo","Đăng ký thành công !")
+                navigation.navigate("DangNhap");
+            })
+            .catch(error =>{
+              console.log(error);
+            })
+        }
+        
+        
+    }
+}
   return (
     <ScrollView style={{ backgroundColor: "#fff", flex: 1 }}>
       <View style={{ marginTop: 40 }}>
@@ -39,8 +83,7 @@ const DangKy = (props) => {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Số điện thoại"
-                  // value={email}
-                  //onChangeText={text => setEmail(text)}
+                  onChangeText={x=>setEmail(x)} value={email}
                   style={styles.input}
                 />
               </View>
@@ -53,8 +96,7 @@ const DangKy = (props) => {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Tên người dùng"
-                  // value={email}
-                  //onChangeText={text => setEmail(text)}
+                  onChangeText={x=>setuserName(x)} value={userName}
                   style={styles.input}
                 />
               </View>
@@ -67,10 +109,9 @@ const DangKy = (props) => {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Mật khẩu"
-                  // value={passWord}
-                  //onChangeText={text => setPassWord(text)}
+                  onChangeText={x=>setPassWord(x)} value={passWord} secureTextEntry={isPassword}
                   style={styles.input}
-                  secureTextEntry
+                  
                 />
               </View>
             </View>
@@ -82,16 +123,14 @@ const DangKy = (props) => {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Nhập lại mật khẩu"
-                  // value={passWord}
-                  //onChangeText={text => setPassWord(text)}
+                  onChangeText={x=>setPassWordAgain(x)} value={passWordAgain} secureTextEntry={isPasswordAgain}
                   style={styles.input}
-                  secureTextEntry
                 />
               </View>
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                //onPress={moveScreen1}
+                onPress={hanldPressRegister}
                 style={styles.button}
               >
                 <Text style={styles.buttonText}>Đăng Ký</Text>
