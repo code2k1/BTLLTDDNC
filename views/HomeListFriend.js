@@ -11,6 +11,7 @@ import Item from "../component/ListFriend/Item";
 import Search from "../component/ListFriend/Search";
 import React, { Component } from "react";
 import { NativeBaseProvider, ScrollView } from "native-base";
+import { useSelector } from "react-redux";
 
 export default function HomeListFriend({ navigation }) {
   var typemessages = [
@@ -235,6 +236,12 @@ export default function HomeListFriend({ navigation }) {
       navigation: navigation,
     },
   ]);
+  const userState = useSelector(state => state.user)
+  const listRoom = userState.rooms;
+  const Data = listRoom.map((e)=>{
+        return ({id:e._id,name:e.name,image:e.avatar,lastMessage:e.messages[0]?.content,time:(e.createdAt)});
+    });
+    console.log(Data);
   return (
     <NativeBaseProvider>
       <SafeAreaView style={styles.container}>

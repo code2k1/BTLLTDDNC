@@ -8,11 +8,13 @@ import {
   KeyboardAvoidingView,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import{initializeAuth,signInWithEmailAndPassword,} from 'firebase/auth';
 import {initializeApp} from 'firebase/app';
 import { firebaseConfig } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
+import {userAPI} from "../../../redux/reducers/user/userAPI";
+import { useDispatch, useSelector } from "react-redux";
 
 const DangNhap = (props) => {
   const navigation = useNavigation();
@@ -21,16 +23,36 @@ const DangNhap = (props) => {
   //Firebase 
   const app = initializeApp(firebaseConfig);
   const auth = initializeAuth(app,{});
-  const hanldPressLogin = ()=>{
-    signInWithEmailAndPassword(auth,email,passWord)
-    .then(()=>{
-        const accessToken =`Bearer ${auth.currentUser.stsTokenManager.accessToken}`;
-        console.log(accessToken);
-        navigation.navigate("HomeListFriend");
-    })
-    .catch(error =>{
-        Alert.alert("Thông báo","Xảy ra lỗi! \n Mời bạn nhập lại tài khoản và mật khẩu")
-    })
+  // redux
+  const dispatch = useDispatch();
+  const userState = useSelector(state => state.user);
+
+  useEffect(() => {
+    if (userState.is_login) {
+        navigation.navigate("HomeListFriend")
+    } else {
+        if (userState.error) {
+            (
+                Alert.alert("Thông báo", "Tài khoản, mật khẩu sai")
+            )
+        }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [userState]);
+
+   const hanldPressLogin = ()=>{
+      signInWithEmailAndPassword(auth,email,passWord)
+      .then(async ()=>{
+          const accessToken =`Bearer ${auth.currentUser.stsTokenManager.accessToken}`;
+          console.log(accessToken);
+          var user =await userAPI.getUserInfo()(accessToken )
+          console.log(user);
+          dispatch(user);
+      })
+      .catch(error =>{
+          Alert.alert("Thông báo","Xảy ra lỗi! \n Mời bạn nhập lại tài khoản và mật khẩu")
+      })
 }
   return (
     <View style={{ backgroundColor: "#fff", flex: 1 }}>
