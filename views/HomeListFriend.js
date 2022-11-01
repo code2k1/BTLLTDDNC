@@ -12,6 +12,13 @@ import Search from "../component/ListFriend/Search";
 import React, { Component } from "react";
 import { NativeBaseProvider, ScrollView } from "native-base";
 import { useSelector } from "react-redux";
+import  io  from "socket.io-client";
+import tokenService from "../services/token.service";
+import { useRef, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import userAPI from "../redux/reducers/user/userAPI";
+export let newSocket = io("https://frozen-caverns-53350.herokuapp.com");
+
 
 export default function HomeListFriend({ navigation }) {
   var typemessages = [
@@ -241,15 +248,101 @@ export default function HomeListFriend({ navigation }) {
   const Data = listRoom.map((e)=>{
         return ({id:e._id,name:e.name,image:e.avatar,lastMessage:e.messages[0]?.content,time:(e.createdAt)});
     });
-    console.log(Data);
+    var count = 0;
+
+    const roomState = useSelector(state => state.room);
+    const [socket, setSocket] = useState(null);
+
+    const rooms = userState.rooms;
+    
+    const dispatch = useDispatch();
+    const token = tokenService.getAccessToken();
+    const roomId = useRef(roomState._id);
+    useEffect(() => {
+        roomId.current = roomState._id;
+    });
+    const message = useRef(roomState.messageSent);
+    useEffect(() => {
+        message.current = roomState.messageSent;
+    });
+    useEffect(() => {
+        if (userState.is_login) {
+            dispatch(userAPI.getUserInfo()(tokenService.getAccessToken()));
+        }
+    }, []);
+    useEffect(() => {
+        newSocket.disconnect();
+        newSocket = io("https://frozen-caverns-53350.herokuapp.com");
+        newSocket?.on("server-send-message", function (data) {
+            if (roomId.current === data.roomId) {
+                dispatch(roomAPI.updateListChat()(data));
+            }
+            dispatch(
+                userAPI.updateListChatForUserNoOnScreen()({
+                    data,
+                    roomId: data.roomId,
+                    rooms,
+                })
+            );
+        });
+        newSocket?.on("connect", () => {
+            console.log("connecting");
+            newSocket.emit("start", { token: token });
+        });
+        newSocket?.on("disconnect", () => {
+            console.log("disconnect");
+        });
+
+        // socket request add friend
+
+        newSocket.on("send-friend-invite", function (data) {
+            console.log(data);
+            dispatch(
+                userAPI.updateListRequestAddFriend()(data.friendInvite.user)
+            );
+        });
+
+        // call video
+
+        // navigator.mediaDevices
+        //     .getUserMedia({ video: true, audio: true })
+        //     .then((stream) => {
+        //         setStream(stream);
+        //         myVideo.current.srcObject = stream;
+        //     });
+
+        // newSocket.on("me", (id) => {
+        //     setMe(id);
+        // });
+
+        // newSocket.on("callUser", (data) => {
+        //     setReceivingCall(true);
+        //     setCaller(data.from);
+        //     setName(data.name);
+        //     setCallerSignal(data.signal);
+        // });
+
+        // call video
+
+        return () => {
+            newSocket?.off("connect");
+            newSocket?.off("disconnect");
+            newSocket?.off("server-send-message");
+        };
+        // }
+    }, [token]);
+    
   return (
     <NativeBaseProvider>
       <SafeAreaView style={styles.container}>
         <Search />
         <FlatList
           style={{ height: "92%" }}
-          data={items}
-          renderItem={({ item }) => <Item {...item} />}
+          data={listRoom}
+          renderItem={({ item }) => {
+            count++;
+            return <Item {...item} navigation={navigation}/>
+          }}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
         />

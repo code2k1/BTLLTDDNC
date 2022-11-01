@@ -1,5 +1,8 @@
 import { Pressable, StyleSheet, View } from "react-native";
 import React, { Component, useState } from "react";
+import roomAPI from "../../redux/reducers/Room/roomAPI";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   Avatar,
   Text,
@@ -253,6 +256,11 @@ var RenderIcon = ({ typemessage }) => (
 export default function Item(props) {
   const [colorItem, setColorItem] = useState("white");
   const navigation = props.navigation;
+  const userState = useSelector(state => state.user)
+  const listRoom = userState.rooms;
+  const accessToken = userState.accessToken;
+  const dispatch = useDispatch();
+  console.log(props);
   return (
     <View style={{ width: "100%", flexDirection: "row" }}>
       {/* {props.children} */}
@@ -262,7 +270,10 @@ export default function Item(props) {
         onPressOut={() => setColorItem("white")}
         onPressIn={() => setColorItem("#f4f4f5")}
         onPress={() => {
-          navigation.navigate(props.page, { name: props.page });
+          const id = props._id;
+          dispatch(roomAPI.getListChat()({ accessToken, id }));
+          dispatch(roomAPI.saveRoomId()(id))
+          navigation.navigate("ChatRoom");
         }}
       >
         <HStack
@@ -271,7 +282,7 @@ export default function Item(props) {
           style={{ alignItems: "center", width: "100%", height: "100%" }}
         >
           {/* <Avatar size="lg" source={{ uri: 'props.image' }} /> */}
-          <Avatar size="lg" source={require("../../image/avatar.png")} />
+          <Avatar size="lg" source={{uri:props.image}} />
           <HStack
             style={{
               flex: 1,
@@ -289,7 +300,7 @@ export default function Item(props) {
                   pt={3}
                   style={{ fontSize: 17, fontWeight: "500" }}
                 >
-                  {props.userName}
+                  {props.name}
                 </Text>
                 <Spacer />
                 <Text
@@ -298,13 +309,13 @@ export default function Item(props) {
                   alignSelf="flex-start"
                   p={0}
                 >
-                  {props.timelastmessage}
+                  {/* {props.timelastmessage} */}
                 </Text>
               </HStack>
               <PreviewMessage
-                typemessage={props.typemessage}
-                recentmessage={props.recentmessage}
-                statusseen={props.statusseen}
+                // typemessage={props.typemessage}
+                recentmessage={props.lastMessage}
+                // statusseen={props.statusseen}
               />
             </View>
           </HStack>

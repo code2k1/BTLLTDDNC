@@ -13,7 +13,7 @@ import{initializeAuth,signInWithEmailAndPassword,} from 'firebase/auth';
 import {initializeApp} from 'firebase/app';
 import { firebaseConfig } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
-import {userAPI} from "../../../redux/reducers/user/userAPI";
+import userAPI from "../../../redux/reducers/user/userAPI";
 import { useDispatch, useSelector } from "react-redux";
 
 const DangNhap = (props) => {
@@ -46,11 +46,12 @@ const DangNhap = (props) => {
       .then(async ()=>{
           const accessToken =`Bearer ${auth.currentUser.stsTokenManager.accessToken}`;
           console.log(accessToken);
-          var user =await userAPI.getUserInfo()(accessToken )
-          console.log(user);
-          dispatch(user);
+          // var user =await userAPI.getUserInfo()(accessToken )
+          // dispatch(userAPI.getUserInfo()(accessToken));
+          dispatch(userAPI.getUserInfo()(accessToken))
       })
       .catch(error =>{
+        console.log(error);
           Alert.alert("Thông báo","Xảy ra lỗi! \n Mời bạn nhập lại tài khoản và mật khẩu")
       })
 }

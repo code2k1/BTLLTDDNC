@@ -15,6 +15,10 @@ import OnboardingItem from "./OnboardingItem";
 import slides from ".././data/slides";
 import Paginator from "./Paginator";
 
+import { useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+
 export default Home = (props) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -27,6 +31,7 @@ export default Home = (props) => {
   }).current;
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+  
 
   return (
     <View>

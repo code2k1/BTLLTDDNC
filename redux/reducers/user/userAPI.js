@@ -6,6 +6,7 @@ class UserAPI {
         return createAsyncThunk(
             "user/get-user-info",
             async (data, thunkAPI) => {
+                console.log(data);
                 const result = await authService.login(data);
                 if (result.status === 200) {
                     const userResult = result.data;
